@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -14,7 +13,7 @@ import {
   Calendar,
   ArrowRight,
   Menu,
-  Search,
+  HelpCircle,
   Filter,
   ChevronDown,
   Clock,
@@ -22,7 +21,9 @@ import {
   Briefcase,
   Download,
   X,
-  Star
+  Star,
+  ArrowUpAZ,
+  ArrowDownWideNarrow
 } from 'lucide-react';
 
 export default function RecruitAI() {
@@ -38,6 +39,7 @@ export default function RecruitAI() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [schedulingCandidate, setSchedulingCandidate] = useState<any | null>(null);
   const [filterStatus, setFilterStatus] = useState('all');
+  const [sortBy, setSortBy] = useState('score'); // score, name, experience
   
   // Processing State
   const [processingProgress, setProcessingProgress] = useState(0);
@@ -164,19 +166,9 @@ export default function RecruitAI() {
   };
 
   const startAnalysis = () => {
-    if (!uploadedJD || uploadedResumes.length === 0) {
-      // For demo purposes, if they haven't uploaded, we'll pretend they did
-      // to show the flow
-      if (uploadedResumes.length === 0) {
-        // Just setting dummy file for visual if needed, 
-        // normally would alert or require file
-      }
-    }
-
     setCurrentView('processing');
     setProcessingProgress(0);
 
-    // Simulation Sequence
     const steps = [
       { progress: 10, text: 'Initializing AI Agent...', file: '' },
       { progress: 30, text: 'Extracting text from PDF', file: 'Rahul_Verma_Resume.pdf' },
@@ -267,7 +259,12 @@ Talent Acquisition`);
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Recruit-AI</h1>
           </div>
           <div className="flex items-center space-x-4">
-            <button className="text-gray-600 hover:text-gray-900 font-medium">Log in</button>
+            <button 
+              onClick={() => setCurrentView('dashboard')}
+              className="text-gray-600 hover:text-gray-900 font-medium"
+            >
+              Log in
+            </button>
             <button 
               onClick={() => setCurrentView('dashboard')}
               className="bg-indigo-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
@@ -299,28 +296,41 @@ Talent Acquisition`);
             </button>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto text-left">
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto text-left mb-20">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
                 <Upload className="text-indigo-600 h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">1. Upload</h3>
               <p className="text-gray-600">Drag & drop your Job Description and bulk resumes. We handle PDFs, Docs, and more.</p>
             </div>
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
                 <Users className="text-indigo-600 h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">2. Analyze</h3>
               <p className="text-gray-600">Our AI reads every resume, comparing skills and experience against your specific requirements.</p>
             </div>
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
                 <CheckCircle className="text-indigo-600 h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">3. Decide</h3>
               <p className="text-gray-600">Get a ranked list of top candidates. Schedule interviews with one click.</p>
             </div>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+             <div className="bg-indigo-900 rounded-2xl p-12 text-center text-white relative overflow-hidden shadow-xl">
+                <div className="relative z-10">
+                  <p className="text-2xl font-medium italic mb-6">"Recruit-AI cut our screening time by 70%. It's like having a superpower."</p>
+                  <div className="font-bold text-lg">Priya</div>
+                  <div className="text-indigo-200 text-sm">Talent Head, EdTech Startup</div>
+                </div>
+                {/* Decorative circles */}
+                <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-indigo-800 rounded-full opacity-50"></div>
+                <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-indigo-800 rounded-full opacity-50"></div>
+              </div>
           </div>
         </div>
       </main>
@@ -472,11 +482,15 @@ Talent Acquisition`);
           ></div>
         </div>
         
-        <div className="flex justify-between text-sm text-gray-500 mb-8">
+        <div className="flex justify-between text-sm text-gray-500 mb-6">
           <span>Progress</span>
           <span>{processingProgress}%</span>
         </div>
 
+        <p className="text-sm text-gray-400 mb-6 animate-pulse">
+           Estimated time: {processingProgress < 50 ? '2 minutes' : 'Less than a minute'} remaining
+        </p>
+        
         <div className="bg-gray-50 rounded-xl p-6 text-left border border-gray-100">
           <div className="flex items-center space-x-3 mb-2">
             <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
@@ -493,13 +507,26 @@ Talent Acquisition`);
   );
 
   const ResultsView = () => {
-    const filteredCandidates = filterStatus === 'all' 
-      ? candidates 
-      : candidates.filter(c => c.status === filterStatus);
+    const getSortedCandidates = () => {
+        let filtered = filterStatus === 'all' 
+          ? candidates 
+          : candidates.filter(c => c.status === filterStatus);
+        
+        return [...filtered].sort((a, b) => {
+            if (sortBy === 'score') return b.score - a.score;
+            if (sortBy === 'name') return a.name.localeCompare(b.name);
+            if (sortBy === 'experience') {
+                return parseInt(b.experience) - parseInt(a.experience);
+            }
+            return 0;
+        });
+    }
+
+    const displayCandidates = getSortedCandidates();
 
     return (
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
             <button 
               onClick={() => setCurrentView('dashboard')}
@@ -515,30 +542,47 @@ Talent Acquisition`);
             </p>
           </div>
           
-          <div className="flex space-x-2 bg-white p-1 rounded-lg border border-gray-200">
-            <button
-              onClick={() => setFilterStatus('all')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filterStatus === 'all' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
-            >
-              All <span className="ml-1 text-xs opacity-70">{candidates.length}</span>
-            </button>
-            <button
-              onClick={() => setFilterStatus('recommended')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filterStatus === 'recommended' ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'}`}
-            >
-              Recommended <span className="ml-1 text-xs opacity-70">{candidates.filter(c => c.status === 'recommended').length}</span>
-            </button>
-            <button
-              onClick={() => setFilterStatus('maybe')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filterStatus === 'maybe' ? 'bg-amber-50 text-amber-700' : 'text-gray-600 hover:bg-gray-50'}`}
-            >
-              Maybe <span className="ml-1 text-xs opacity-70">{candidates.filter(c => c.status === 'maybe').length}</span>
-            </button>
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+            {/* Filter Tabs */}
+            <div className="flex space-x-2 bg-white p-1 rounded-lg border border-gray-200 overflow-x-auto">
+              <button
+                onClick={() => setFilterStatus('all')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${filterStatus === 'all' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+              >
+                All <span className="ml-1 text-xs opacity-70">{candidates.length}</span>
+              </button>
+              <button
+                onClick={() => setFilterStatus('recommended')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${filterStatus === 'recommended' ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'}`}
+              >
+                Recommended <span className="ml-1 text-xs opacity-70">{candidates.filter(c => c.status === 'recommended').length}</span>
+              </button>
+              <button
+                onClick={() => setFilterStatus('maybe')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${filterStatus === 'maybe' ? 'bg-amber-50 text-amber-700' : 'text-gray-600 hover:bg-gray-50'}`}
+              >
+                Maybe <span className="ml-1 text-xs opacity-70">{candidates.filter(c => c.status === 'maybe').length}</span>
+              </button>
+            </div>
+
+            {/* Sort Control */}
+            <div className="flex items-center space-x-2 bg-white px-3 py-1 rounded-lg border border-gray-200">
+                <span className="text-gray-500 text-sm whitespace-nowrap">Sort by:</span>
+                <select 
+                  value={sortBy} 
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-transparent text-gray-700 text-sm font-medium focus:outline-none py-1 pr-4 cursor-pointer"
+                >
+                    <option value="score">Match Score</option>
+                    <option value="name">Name</option>
+                    <option value="experience">Experience</option>
+                </select>
+            </div>
           </div>
         </div>
 
         <div className="space-y-4">
-          {filteredCandidates.map((candidate) => (
+          {displayCandidates.map((candidate) => (
             <div
               key={candidate.id}
               className={`bg-white rounded-xl border border-gray-200 border-l-[6px] ${getStatusColor(candidate.status)} p-6 shadow-sm hover:shadow-md transition-all`}
@@ -568,7 +612,7 @@ Talent Acquisition`);
                     </div>
                     <div className="text-right lg:hidden">
                       <div className={`text-2xl font-bold ${getScoreColor(candidate.score)}`}>
-                        {candidate.score}
+                        {candidate.score} <span className="text-sm text-gray-400 font-normal">/100</span>
                       </div>
                       <div className="text-xs text-gray-400 font-medium">MATCH SCORE</div>
                     </div>
@@ -605,7 +649,7 @@ Talent Acquisition`);
                 <div className="flex flex-col justify-between items-end border-l border-gray-100 pl-6 min-w-[200px]">
                   <div className="hidden lg:block text-right mb-6">
                     <div className={`text-4xl font-extrabold ${getScoreColor(candidate.score)}`}>
-                      {candidate.score}
+                      {candidate.score}<span className="text-lg text-gray-300 ml-1">/100</span>
                     </div>
                     <div className="text-xs text-gray-400 font-bold tracking-wider">MATCH SCORE</div>
                   </div>
@@ -655,7 +699,7 @@ Talent Acquisition`);
               </div>
               <div className="flex items-center space-x-4">
                 <button className="text-gray-500 hover:text-gray-900">
-                  <Search className="h-5 w-5" />
+                  <HelpCircle className="h-5 w-5" />
                 </button>
                 <div className="h-8 w-px bg-gray-200"></div>
                 <div className="flex items-center space-x-2">
